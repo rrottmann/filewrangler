@@ -22,7 +22,7 @@ optional arguments:
     right before the file extension to a test file
 
 ~~~
-]# ls -l
+$ ls -l
 total 0
 -rw-r--r--. 1 root root 0 Jan  6 02:56 170106-test-file [backup perm public docs websites].html
 ~~~ 
@@ -62,7 +62,7 @@ total 0
   * Run filewrangler with debug output
 
 ~~~
-# ~/filewrangler/filewrangler.py --debug
+$ ~/filewrangler/filewrangler.py --debug
 #DEBUG: Processing directory: .
 #DEBUG: Processing rules from file: rules.yml
 #INFO:  * Processing rule: Example: Move backup/perm/public/docs/websites
