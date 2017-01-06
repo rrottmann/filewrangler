@@ -79,6 +79,7 @@ def _rules_engine(path, rules=None):
                         cmd = action['cmd']
                         if '{}' in cmd:
                             cmd = cmd.replace('{}', fname)
+                            cmd = cmd.replace('{d}', path)
                         if 'cmds' not in actions[fname].keys():
                             actions[fname]['cmds'] = []
                         actions[fname]['cmds'].append(cmd)

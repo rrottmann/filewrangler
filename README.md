@@ -160,7 +160,10 @@ You simply have to add '(?!' at the beginning and ')' at the end of the regular 
 The script currently offers only regex matches for conditions and cmd actions.
 
 While the regular expressions can be used for very complex scenarios, the cmd
-action currently only supports expansion of the original filename via '{}'.
+action currently only supports expansion of the following variables:
+
+ * {}:  original filename
+ * {d}: processed directory (--path)
 
 However as simple shell scriptlets are being executed, you could use shell
 variables to your likings. Simply declare them, so that they are available for
