@@ -110,3 +110,91 @@ drwxr-xr-x. 2 root root 76 Jan  6 03:06 .
 drwxr-xr-x. 3 root root 21 Jan  6 03:06 ..
 -rw-r--r--. 1 root root  0 Jan  6 02:56 170106-test-file\ \[backup\ perm\ public\ docs\ websites\].html
 ~~~
+
+# Create your own rules with mkrule.py
+
+While you could create your rules manually, you could also use the mkrule.py script for simple move operations
+
+~~~
+ ./mkrule.py  --description="Move files matching foo/bar/baz to /tmp/foo/bar/baz" --directory="/tmp/foo/bar/baz" --tags='foo,bar,baz'
+---
+- rule: 68c5f194-af1b-4e2b-a87e-b4df78b1211d
+  description: 'Move files matching foo/bar/baz to /tmp/foo/bar/baz'
+  conditions:
+    - condition: f435fd85-760a-46b7-8ab3-49e7e94712f1
+      type: 'regex'
+      regex: '^.*\[.*foo.*\].*$
+    - condition: c506875c-9315-4684-ad30-25629d5a30c9
+      type: 'regex'
+      regex: '^.*\[.*bar.*\].*$
+    - condition: 68aed435-9583-4062-b3c5-7f5160a80335
+      type: 'regex'
+      regex: '^.*\[.*baz.*\].*$
+   actions:
+     - action: 587dbf76-eaa0-4967-93f3-e0b5fd521c78
+       type: 'cmd'
+       cmd: '[ -d /tmp/foo/bar/baz] || mkdir -p /tmp/foo/bar/baz'
+     - action: 2759131d-0f61-41fd-9aaa-7da89b8a3ae4
+       type: 'cmd'
+       cmd: 'mv "{}" "/tmp/foo/bar/baz/{}"'
+...
+~~~
+
+# Tipp: Exclude tags from rule
+
+Maybe you want to exclude a specific tag from a rule. At least I use it a lot!
+This is done very easily - even when you have zero knowledge of Python's regex.
+
+E.g you do not want to do any actions on files with the tag 'doc'.
+
+The necessary regular expression to invert the match is as follows:
+
+~~~
+'(?!^.*\[.*docs.*\].*)'
+~~~
+
+You simply have to add '(?!' at the beginning and ')' at the end of the regular expression.
+
+# Tipp: Workarounds for the limited condition matching and actions
+
+The script currently offers only regex matches for conditions and cmd actions.
+
+While the regular expressions can be used for very complex scenarios, the cmd
+action currently only supports expansion of the original filename via '{}'.
+
+However as simple shell scriptlets are being executed, you could use shell
+variables to your likings. Simply export them, so that they are available for
+the following command:
+
+~~~
+  actions:
+    - action: 72bde999-40a4-40c8-8888-507bade035f1
+      type: 'cmd'
+      cmd: 'baz=foo;'
+    - action: 368ee9e0-3a0c-443e-9a5b-5f9fa15c604f
+      type: 'cmd'
+      cmd: 'echo $baz'
+~~~
+
+Output:
+
+~~~
+./filewrangler.py --quiet| sh -x
++ baz=super
++ echo foo
+foo
+~~~
+
+# Tipp: Add tags based on other tags
+
+You could combine this script with https://github.com/rrottmann/managetags
+That is also my major use case for the managetags tool.
+
+# Tipp: Works great on Windows!
+
+While I use this tool mainly on Linux / BSD, the script works within Cygwin on
+Windows (needed because of mv / bash).
+
+However you will need to install a Python interpreter during Cygwin setup!
+
+Cywin may be found here: http://cygwin.org/
