@@ -24,7 +24,7 @@ def _mkrule(description, directory, tags=None):
     for tag in tags:
         rule.append('    - condition: ' + str(uuid.uuid4()))
         rule.append("      type: 'regex'")
-        rule.append("      regex: '^.*\[.*" + tag + ".*\].*$")
+        rule.append("      regex: '^.*\[.*" + tag + ".*\].*$'")
     rule.append('   actions:')
     rule.append('     - action: ' + str(uuid.uuid4()))
     rule.append("       type: 'cmd'")
