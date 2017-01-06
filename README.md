@@ -163,7 +163,7 @@ While the regular expressions can be used for very complex scenarios, the cmd
 action currently only supports expansion of the original filename via '{}'.
 
 However as simple shell scriptlets are being executed, you could use shell
-variables to your likings. Simply export them, so that they are available for
+variables to your likings. Simply declare them, so that they are available for
 the following command:
 
 ~~~
@@ -180,7 +180,7 @@ Output:
 
 ~~~
 ./filewrangler.py --quiet| sh -x
-+ baz=super
++ baz=foo
 + echo foo
 foo
 ~~~
