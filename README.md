@@ -268,6 +268,12 @@ it's original filename.
 The filewrangler script usually gets invoked via cron. So the renamed file
 will be picked up during the next run.
 
+# Tipp: You can comment out rules
+
+Especially during the development of your ruleset, you may need to comment
+out some rules or you want to add sample rules as a reference.
+YAML supports comments. All lines that begin with '#' are ignored.
+
 # Tipp: Works great on Windows!
 
 While I use this tool mainly on Linux / BSD, the script works within Cygwin on
