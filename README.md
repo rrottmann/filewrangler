@@ -234,6 +234,10 @@ And you may search even in PDF files:
 
 pdf2text is part of poppler-utils package on Debian / CentOS
 
+Please note: The above examples seem complex and use a lot of shell
+scripting vodoo. However, in most cases you do not need to change
+the commands later and may use them as a blueprint.
+
 # Tipp: Works great on Windows!
 
 While I use this tool mainly on Linux / BSD, the script works within Cygwin on
