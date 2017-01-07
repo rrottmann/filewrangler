@@ -146,7 +146,6 @@ def _condition_atime(path, minutes):
     now = now.strftime(fmt)
     atime = datetime.datetime.strptime(time.ctime(os.path.getatime(path)), "%c").strftime(fmt)
     logging.debug(' '*8 + '* File access time: ' + str((int(now)-int(atime))/60) + ' minute(s) ago')
-    print  int(atime),  int(now) - 60 * minutes, int(now) - 60 * minutes -  int(atime), int(atime) < int(now) - 60 * minutes
     if int(atime) > int(now) - 60 * minutes:
         return False
     else:
