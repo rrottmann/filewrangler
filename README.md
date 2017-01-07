@@ -157,7 +157,7 @@ You simply have to add '(?!' at the beginning and ')' at the end of the regular 
 
 # Tipp: Workarounds for the limited condition matching and actions
 
-The script currently offers only regex matches for conditions and cmd actions.
+The script currently offers only regex matches and cmd for both conditions and actions.
 
 While the regular expressions can be used for very complex scenarios, the cmd
 action currently only supports expansion of the following variables:
@@ -192,6 +192,47 @@ foo
 
 You could combine this script with https://github.com/rrottmann/managetags
 That is also my major use case for the managetags tool.
+
+# Tipp: Use cmd condition for advanced rules
+
+The cmd condition has been implemented. This allows more advanced conditions.
+
+E.g. to match the mime type of a file:
+
+~~~
+    - condition: c9ca025e-dca1-4545-941e-0e251eeb59b9
+      type: 'cmd'
+      cmd: 'file -ib "{}" | cut -d \; -f1 | tr -d "\n"'
+      stdout: 'video/mp4'
+~~~
+
+You could also grep for a given string in a text file:
+
+~~~
+    - condition: 330389fe-6d1a-4c8f-a492-014193531654
+      type: 'cmd'
+      cmd: 'file -ib "{}" | cut -d \; -f1 | tr -d "\n"'
+      stdout: 'text/plain'
+    - condition: 031ef121-7554-449b-affb-5fb27ea2c9fa
+      type: 'cmd'
+      cmd: 'grep -q "ABCD" "{}"'
+      returncode: 0
+~~~
+
+And you may search even in PDF files:
+
+~~~
+    - condition: e4e73700-e228-4602-8531-83c8c26f944b
+      type: 'cmd'
+      cmd: 'file -ib "{}" | cut -d \; -f1 | tr -d "\n"'
+      stdout: 'application/pdf'
+    - condition: 3f3f132c-9878-458a-bfee-412962921fe9
+      type: 'cmd'
+      cmd: 'pdftotext "{}" - | grep -q "ABCD"'
+      returncode: 0
+~~~
+
+pdf2text is part of poppler-utils package on Debian / CentOS
 
 # Tipp: Works great on Windows!
 
