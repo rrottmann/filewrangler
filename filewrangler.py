@@ -71,7 +71,7 @@ def _rules_engine(path, rules=None):
                         minutes = condition['atime']
                         logging.debug(' '*6+'* Processing atime: ' +
                                       'last access before ' +
-                                      str(minutes) + ' minutes')
+                                      str(minutes) + ' minute(s)')
                         if _condition_atime(os.path.join(path, fname), minutes):
                             match = True
                         else:
@@ -145,7 +145,9 @@ def _condition_atime(path, minutes):
     now = datetime.datetime.now()
     now = now.strftime(fmt)
     atime = datetime.datetime.strptime(time.ctime(os.path.getatime(path)), "%c").strftime(fmt)
-    if int(atime) < int(now) - 60 * minutes:
+    logging.debug(' '*8 + '* File access time: ' + str((int(now)-int(atime))/60) + ' minute(s) ago')
+    print  int(atime),  int(now) - 60 * minutes, int(now) - 60 * minutes -  int(atime), int(atime) < int(now) - 60 * minutes
+    if int(atime) > int(now) - 60 * minutes:
         return False
     else:
         return True
