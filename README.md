@@ -196,6 +196,30 @@ Output:
 foo
 ~~~
 
+This could be used for example to prepend the file's creation date:
+
+~~~
+- rule: 00b70fb6-d6b4-11e6-9d7e-cfc8c0b233a1
+  description: 'Prepend file creation date to 7z|doc|docx|htm|html|md|mhtml|ods|odt|rst|txt|xls|xlsx|zip'
+  conditions:
+    - condition: 4d10e2ec-d6b4-11e6-89e9-471278e9b7c1
+      type: 'regex'
+      regex: '^.*\.(7z|doc|docx|htm|html|md|mhtml|ods|odt|rst|txt|xls|xlsx|zip)$'
+    - condition: a357dbc2-d6b6-11e6-b1c0-973f85398267
+      type: 'regex'
+      regex: '(?!^\d{4}.*$)'
+  actions:
+    - condition: 18b86c44-d6b5-11e6-9513-9bb78cabf0b1
+      type: 'atime'
+      atime: 1
+    - action: 96ffdcaa-d6b4-11e6-9e7a-9f3deaa37bb3
+      type: 'cmd'
+      cmd: 'ts=$(stat -c "%y" "{d}/{}" | tr -d "-" | cut -d" " -f1 | sed "s/^20//g")'
+    - action: e2a24ee0-d6b4-11e6-8a5a-bbef2dff80dd
+      type: 'cmd'
+      cmd: 'mv "{d}/{}" "{d}/$ts-{}"' 
+~~~
+
 # Tipp: Add tags based on other tags
 
 You could combine this script with https://github.com/rrottmann/managetags
