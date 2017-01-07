@@ -220,10 +220,31 @@ This could be used for example to prepend the file's creation date:
       cmd: 'mv "{d}/{}" "{d}/$ts-{}"' 
 ~~~
 
-# Tipp: Add tags based on other tags
+# Tipp: Add tags based on other tags / regular expressions
 
 You could combine this script with https://github.com/rrottmann/managetags
 That is also my major use case for the managetags tool.
+
+E.g. you could tag bank statements automatically:
+
+~~~
+- rule: 4eba2a3a-d6fb-11e6-98a4-33d9c4753983
+  description: 'Tag bank statements from DiBa'
+  conditions:
+    - condition: 549745f0-d6fb-11e6-8f57-e3459bf31d72
+      type: 'atime'
+      atime: 1
+    - condition: 5b469f22-d6fb-11e6-9161-23258a155688
+      type: 'regex'
+      regex: '^Direkt_Depot_\d{10}_.*\.pdf'
+  actions:
+    - action: 60057cf4-d6fb-11e6-bf35-9340807a3666
+      type: 'cmd'
+      cmd: 'depot=$(echo -n "{}" | grep -Eo "_[0-9]{10}" | tr -d "_")'
+    - action: 6453b104-d6fb-11e6-a5d1-635d61273ed2
+      type: 'cmd'
+      cmd: '/opt//managetags/managetags.py --path "{d}/{}" --addtags="backup,perm,secret,important,docs,finances,diba,depot$depot" | sh -x'
+~~~
 
 # Tipp: Use cmd condition for advanced rules
 
