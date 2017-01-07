@@ -18,6 +18,19 @@ import datetime
 import subprocess
 
 
+def _execute(cmds=None):
+    '''Execute a list of commands.'''
+    for cmd in cmds:
+        logging.debug('* Executing cmd: ' + cmd) 
+        process = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
+        stdout, stderr = process.communicate()
+        if stdout:
+            for line in stdout.splitlines():
+                logging.debug('  * STDOUT: ' + line) 
+        if stderr:
+            for line in stderr.splitlines():
+                logging.debug('  * STDERR: ' + line) 
+
 
 def _load_rules(path='rules.yml'):
     '''Load rules yaml file from path.'''
@@ -138,7 +151,7 @@ def _condition_atime(path, minutes):
         return True
 
 
-def _print_actions(actions):
+def _execute_actions(actions, dryrun=True):
     '''Output given actions dict to stdout.'''
     for fname in actions.keys():
         for action in actions[fname].keys():
@@ -148,7 +161,10 @@ def _print_actions(actions):
                 if elem == 'cmds':
                     logging.debug('Commands for file: ' + fname)
                     for cmd in actions[fname][elem]:
-                        print cmd
+                        if dryrun:
+                            print cmd
+                        else:
+                            _execute([cmd])
 
 
 def _replace_variables(strinput, fname, path):
@@ -161,8 +177,14 @@ def _replace_variables(strinput, fname, path):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='''
+    Organize files according to tags and custom rulesets.''',
+    epilog='''
+    Copyright 2017 by Reiner Rottmann <reiner@rottmann.it>.
+    Released under GPLv3.
+    ''')
     parser.add_argument('--debug', help='Enable debug output.', action='store_true')
+    parser.add_argument('--execute', help='Execute the generated commands.', action='store_true')
     parser.add_argument('--path',
                         help='Path to process. Default: .',
                         default='.')
@@ -180,6 +202,9 @@ if __name__ == "__main__":
             logging.basicConfig(level=logging.INFO, format='#%(levelname)s: %(message)s')
     logging.debug('Processing directory: ' + args.path)
     logging.debug('Processing rules from file: ' + args.rules)
+    if args.execute is False:
+        logging.debug('Running in dryrun mode.')
+
     if not os.path.exists(args.path) or not os.path.isdir(args.path):
         logging.error('No such dir: ' + args.path)
         sys.exit(1)
@@ -191,4 +216,7 @@ if __name__ == "__main__":
         logging.error('No rules found.')
         sys.exit(1)
     actions = _rules_engine(args.path, rules)
-    _print_actions(actions)
+    if args.execute is True:
+        _execute_actions(actions, dryrun=False)
+    else:
+        _execute_actions(actions)

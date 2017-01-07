@@ -6,14 +6,20 @@ Define custom rules and filewrangler will do the organization.
 
 ~~~
 $ ./filewrangler.py --help
-usage: filewrangler.py [-h] [--debug] [--path PATH] [--quiet] [--rules RULES]
+usage: filewrangler.py [-h] [--debug] [--execute] [--path PATH] [--quiet]
+                       [--rules RULES]
+
+Organize files according to tags and custom rulesets.
 
 optional arguments:
   -h, --help     show this help message and exit
   --debug        Enable debug output.
+  --execute      Execute the generated commands.
   --path PATH    Path to process. Default: .
   --quiet        Quiet mode.
   --rules RULES  Yaml file with rules. Default: rules.yml
+
+Copyright 2017 by Reiner Rottmann <reiner@rottmann.it>. Released under GPLv3.
 ~~~
 
 ## Example: Move files according to tags
@@ -100,6 +106,8 @@ $ filewrangler.py --quiet | sh -x
 + mkdir -p /tmp/backup/perm/public/docs/websites
 + mv '170106-test-file\ \[backup\ perm\ public\ docs\ websites\].html' '/tmp/backup/perm/public/docs/websites/170106-test-file\ \[backup\ perm\ public\ docs\ websites\].html'
 ~~~
+
+You can also append the commandline option '--execute' to run all the generated commands.
 
   * The file has now been organized according to the rule set.
 
