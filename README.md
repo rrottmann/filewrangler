@@ -313,7 +313,7 @@ it's original filename.
 The filewrangler script usually gets invoked via cron. So the renamed file
 will be picked up during the next run.
 
-# Tipp: Use skip cmd for advanced rules
+# Tipp: Use skip action for advanced rules
 
 The skip action has been implemented. This allows more advanced rulesets.
 
