@@ -128,7 +128,6 @@ def _rules_engine(path, rules=None):
             if brk:
                 continue
             for action in rule['actions']:
-                print action
                 logging.debug('    * Processing action: ' +
                         action['action'])
                 if 'type' in action.keys():
