@@ -313,6 +313,34 @@ it's original filename.
 The filewrangler script usually gets invoked via cron. So the renamed file
 will be picked up during the next run.
 
+# Tipp: Use skip cmd for advanced rules
+
+The skip action has been implemented. This allows more advanced rulesets.
+
+When all conditions of a ruleset match, you could use the skip action to add
+the filename to a skip list. This means, that it will be ignored for the rest
+of the current execution phase.
+
+E.g.:
+
+~~~
+- action: 84cb4a8d-c34e-425e-bbd5-1c8f953b12e5
+  type: 'skip'
+~~~
+
+Resulting in:
+~~~
+...
+#DEBUG:     * Processing action: 84cb4a8d-c34e-425e-bbd5-1c8f953b12e5
+#DEBUG:       * Type: skip
+#DEBUG:         * Adding file to the skip list.
+#DEBUG:     * Processing action: 554c5975-23d3-42e4-ade8-b7b558bc228f
+#DEBUG:       * Type: cmd
+#DEBUG:          * cmd: 'echo $baz'
+#DEBUG:            * File is on the skip list. Ignoring action.
+..
+~~~
+
 # Tipp: You can comment out rules
 
 Especially during the development of your ruleset, you may need to comment

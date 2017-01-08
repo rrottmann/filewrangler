@@ -45,6 +45,7 @@ def _rules_engine(path, rules=None):
     files = os.listdir(path)
     targets = []
     actions = {}
+    skip = []
     for rule in rules:
         logging.info(' * Processing rule: ' + rule['description'])
         for elem in ['rule', 'description', 'conditions', 'actions']:
@@ -127,6 +128,17 @@ def _rules_engine(path, rules=None):
             if brk:
                 continue
             for action in rule['actions']:
+                print action
+                logging.debug('    * Processing action: ' +
+                        action['action'])
+                if 'type' in action.keys():
+                    type = action['type']
+                    logging.debug(' '*6+'* Type: ' + type)
+                    if type in action.keys():
+                        logging.debug(' '*8+' * ' + type + ': \'' + action[type] + "'")
+                if fname in skip:
+                    logging.debug(' '*11+'* File is on the skip list. Ignoring action.')
+                    continue
                 if 'type' not in action.keys():
                     continue
                 if action['type'] == 'cmd':
@@ -136,6 +148,8 @@ def _rules_engine(path, rules=None):
                         if 'cmds' not in actions[fname].keys():
                             actions[fname]['cmds'] = []
                         actions[fname]['cmds'].append(cmd)
+                if action['type'] == 'skip':
+                    skip.append(fname)
     return actions
 
 
