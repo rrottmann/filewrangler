@@ -11,8 +11,10 @@ import os
 import re
 import sys
 import yaml
+import time
 import logging
 import argparse
+import datetime
 import subprocess
 
 
@@ -51,6 +53,16 @@ def _rules_engine(path, rules=None):
                 logging.debug('    * Processing condition: ' +
                               condition['condition'])
                 match = False
+                if condition['type'] == 'atime':
+                    if 'atime' in condition.keys():
+                        minutes = condition['atime']
+                        logging.debug(' '*6+'* Processing atime: ' +
+                                      'last access before ' +
+                                      str(minutes) + ' minutes')
+                        if _condition_atime(os.path.join(path, fname), minutes):
+                            match = True
+                        else:
+                            match = False
                 if condition['type'] == 'cmd':
                     if 'cmd' in condition.keys():
                         cmd = condition['cmd']
@@ -65,8 +77,6 @@ def _rules_engine(path, rules=None):
                             if stdout == condition['stdout']:
                                 match = True
                             else:
-                                print cmd
-                                print stdout
                                 match = False
                         if 'returncode' in condition.keys():
                             logging.debug(' '*8+'* Checking for returncode: ' +
@@ -114,6 +124,18 @@ def _rules_engine(path, rules=None):
                             actions[fname]['cmds'] = []
                         actions[fname]['cmds'].append(cmd)
     return actions
+
+
+def _condition_atime(path, minutes):
+    '''Check whether the file has not been accessed for the given minutes.'''
+    fmt = "%s"
+    now = datetime.datetime.now()
+    now = now.strftime(fmt)
+    atime = datetime.datetime.strptime(time.ctime(os.path.getatime(path)), "%c").strftime(fmt)
+    if int(atime) < int(now) - 60 * minutes:
+        return False
+    else:
+        return True
 
 
 def _print_actions(actions):

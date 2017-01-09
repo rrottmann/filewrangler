@@ -238,6 +238,28 @@ Please note: The above examples seem complex and use a lot of shell
 scripting vodoo. However, in most cases you do not need to change
 the commands later and may use them as a blueprint.
 
+# Tipp: Use atime condition for advanced rules
+
+The atime condition has been implemented. This allows more advanced conditions.
+
+E.g. You could use this condition to check whether the file is settled and has not
+been accessed some minutes before.
+
+~~~
+    - condition: 2a4ea45c-c400-4cdf-a3d1-a87d383018af
+      type: 'atime'
+      atime: 5
+~~~
+
+This is especially useful, if you intend to add tags to a file and thus you
+are renaming it and then you intend to move the file. 
+
+As the file has been renamed, later rules will not find the file with
+it's original filename.
+
+The filewrangler script usually gets invoked via cron. So the renamed file
+will be picked up during the next run.
+
 # Tipp: Works great on Windows!
 
 While I use this tool mainly on Linux / BSD, the script works within Cygwin on
