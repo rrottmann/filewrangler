@@ -13,6 +13,7 @@ import sys
 import yaml
 import logging
 import argparse
+import subprocess
 
 
 
@@ -49,26 +50,57 @@ def _rules_engine(path, rules=None):
                         continue
                 logging.debug('    * Processing condition: ' +
                               condition['condition'])
+                match = False
+                if condition['type'] == 'cmd':
+                    if 'cmd' in condition.keys():
+                        cmd = condition['cmd']
+                        cmd = _replace_variables(cmd, fname, path)
+                        logging.debug(' '*6+'* Processing cmd: ' +
+                                      condition['cmd'])
+                        process = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
+                        stdout, stderr = process.communicate()
+                        if 'stdout' in condition.keys():
+                            logging.debug(' '*8+'* Checking for stdout: ' +
+                                          condition['stdout'])
+                            if stdout == condition['stdout']:
+                                match = True
+                            else:
+                                print cmd
+                                print stdout
+                                match = False
+                        if 'returncode' in condition.keys():
+                            logging.debug(' '*8+'* Checking for returncode: ' +
+                                          str(condition['returncode']))
+                            if process.returncode == condition['returncode']:
+                                match = True
+                            else:
+                                match = False
+                    else:
+                        logging.warning('Missing element in' +
+                                        'condition definition: cmd')
+                        continue
                 if condition['type'] == 'regex':
                     if 'regex' in condition.keys():
                         logging.debug(' '*6+'* Processing regex: ' +
                                       condition['regex'])
                         regex = re.compile(condition['regex'])
                         if regex.match(fname):
-                            logging.debug(' '*8+'* Condition matched.')
-                            if fname not in targets:
-                                targets.append(fname)
-                            continue
-                        else:
-                            logging.debug(' '*8+'* Condition did NOT match.')
-                            if fname in targets:
-                                targets.remove
-                            brk = True
-                            break
+                            match = True
                     else:
                         logging.warning('Missing element in' +
                                         'condition definition: regex')
                         continue
+                if match:
+                    logging.debug(' '*8+'* Condition matched.')
+                    if fname not in targets:
+                        targets.append(fname)
+                    continue
+                else:
+                    logging.debug(' '*8+'* Condition did NOT match.')
+                    if fname in targets:
+                        targets.remove
+                    brk = True
+                    break
             if brk:
                 continue
             for action in rule['actions']:
@@ -77,10 +109,7 @@ def _rules_engine(path, rules=None):
                 if action['type'] == 'cmd':
                     if 'cmd' in action.keys():
                         cmd = action['cmd']
-                        if '{}' in cmd:
-                            cmd = cmd.replace('{}', fname)
-                        if '{d}' in cmd:
-                            cmd = cmd.replace('{d}', path)
+                        cmd = _replace_variables(cmd, fname, path)
                         if 'cmds' not in actions[fname].keys():
                             actions[fname]['cmds'] = []
                         actions[fname]['cmds'].append(cmd)
@@ -98,6 +127,15 @@ def _print_actions(actions):
                     logging.debug('Commands for file: ' + fname)
                     for cmd in actions[fname][elem]:
                         print cmd
+
+
+def _replace_variables(strinput, fname, path):
+    '''Conditions and actions can use program internal variables.'''
+    if '{}' in strinput:
+        strinput = strinput.replace('{}', fname)
+    if '{d}' in strinput:
+        strinput = strinput.replace('{d}', path)
+    return strinput
 
 
 if __name__ == "__main__":
