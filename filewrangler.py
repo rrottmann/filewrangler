@@ -40,12 +40,29 @@ def _load_rules(path='rules.yml'):
     return yml
 
 
+def _load_skiplist(path='skip.yml'):
+    fd = open(path, 'r')
+    yml = yaml.safe_load(fd)
+    fd.close()
+    return yml
+
+
+def _save_skiplist(skiplist, path='skip.yml'):
+    yml = yaml.dump(skiplist, default_flow_style = False, allow_unicode = True, encoding = None)
+    fd = open(path, 'w')
+    fd.write(yml)
+    fd.close()
+
+
 def _rules_engine(path, rules=None):
     '''Processes all files in given path. Requires rules dict.'''
     files = os.listdir(path)
     targets = []
     actions = {}
-    skip = []
+    if os.path.exists('skip.yml'):
+        skip = _load_skiplist()
+    else:
+        skip = {}
     for rule in rules:
         logging.info(' * Processing rule: ' + rule['description'])
         for elem in ['rule', 'description', 'conditions', 'actions']:
@@ -135,8 +152,11 @@ def _rules_engine(path, rules=None):
                     logging.debug(' '*6+'* Type: ' + type)
                     if type in action.keys():
                         logging.debug(' '*8+' * ' + type + ': \'' + action[type] + "'")
-                if fname in skip:
+                if fname in skip.keys():
                     logging.debug(' '*11+'* File is on the skip list. Ignoring action.')
+                    skip[fname] -= 1
+                    if skip[fname] <= 0:
+                        del skip[fname]
                     continue
                 if 'type' not in action.keys():
                     continue
@@ -148,7 +168,10 @@ def _rules_engine(path, rules=None):
                             actions[fname]['cmds'] = []
                         actions[fname]['cmds'].append(cmd)
                 if action['type'] == 'skip':
-                    skip.append(fname)
+                    if not fname in skip.keys():
+                        skip[fname] = 0
+                    skip[fname] += 1
+    _save_skiplist(skip)
     return actions
 
 
